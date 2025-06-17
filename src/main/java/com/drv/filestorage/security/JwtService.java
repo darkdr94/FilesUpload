@@ -25,7 +25,6 @@ public class JwtService {
         key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
-    //TODO almacenar variable de tiempo en ssm
     public JwtResponseDto generateToken(String username) {
         String tokenJwt = Jwts.builder()
                 .setSubject(username)

@@ -19,7 +19,7 @@ public class MimeTypeValidator implements ConstraintValidator<ValidMimeType, Mul
             Map.entry("csv", "text/csv"),
             Map.entry("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
             Map.entry("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            // puedes agregar más aquí
+            // Ampliar lista
     );
 
     @Override

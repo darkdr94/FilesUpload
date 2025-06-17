@@ -38,8 +38,6 @@ public class UploadedFileEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Getters y setters
-
     public UUID getId() {
         return id;
     }
