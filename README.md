@@ -188,7 +188,7 @@ Las partes del archivo quedaran con los nombres: part_000.bin, part_001.bin, ...
 
 ## 🛠️ Tecnologías Usadas
 
-* 🧠 Java 20
+* 🧠 Java 21
 * 🔥 Spring Boot 3.2.5
 * ☁️ AWS S3 (Multipart Upload)
 * 🛡️ AWS SSM (Parameter Store)
