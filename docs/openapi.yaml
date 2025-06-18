@@ -40,47 +40,6 @@
                 },
               "responses":
                 {
-                  "401":
-                    {
-                      "description": "Error de autenticación",
-                      "content":
-                        {
-                          "application/json":
-                            {
-                              "schema":
-                                {
-                                  "type": "string",
-                                  "example":
-                                    {
-                                      "status": 401,
-                                      "error": "Unauthorized",
-                                      "message": "El encabezado de autorizacion es invalido o no esta presente.",
-                                      "path": "/files-upload/generate-multipart-urls",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                  "500":
-                    {
-                      "description": "Error interno del servidor",
-                      "content":
-                        {
-                          "application/json":
-                            {
-                              "schema":
-                                {
-                                  "type": "string",
-                                  "example":
-                                    {
-                                      "error": "INTERNAL_SERVER_ERROR",
-                                      "message": "Ocurrio un error inesperado",
-                                      "status": 500,
-                                    },
-                                },
-                            },
-                        },
-                    },
                   "400":
                     {
                       "description": "Errores de validación",
@@ -100,6 +59,27 @@
                                           "filename": "El nombre del archivo solo puede contener letras, números, guiones, puntos y guiones bajos",
                                         },
                                       "message": "Errores de validación",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                  "401":
+                    {
+                      "description": "Error de autenticación",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "example":
+                                    {
+                                      "status": 401,
+                                      "error": "Unauthorized",
+                                      "message": "El encabezado de autorizacion es invalido o no esta presente.",
+                                      "path": "/files-upload/generate-multipart-urls",
                                     },
                                 },
                             },
@@ -147,6 +127,26 @@
                             },
                         },
                     },
+                  "500":
+                    {
+                      "description": "Error interno del servidor",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "example":
+                                    {
+                                      "error": "INTERNAL_SERVER_ERROR",
+                                      "message": "Ocurrio un error inesperado",
+                                      "status": 500,
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
             },
         },
@@ -174,47 +174,6 @@
                 },
               "responses":
                 {
-                  "401":
-                    {
-                      "description": "Error de autenticación",
-                      "content":
-                        {
-                          "application/json":
-                            {
-                              "schema":
-                                {
-                                  "type": "string",
-                                  "example":
-                                    {
-                                      "status": 401,
-                                      "error": "Unauthorized",
-                                      "message": "El encabezado de autorizacion es invalido o no esta presente.",
-                                      "path": "/files-upload/generate-multipart-urls",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                  "500":
-                    {
-                      "description": "Error interno del servidor",
-                      "content":
-                        {
-                          "application/json":
-                            {
-                              "schema":
-                                {
-                                  "type": "string",
-                                  "example":
-                                    {
-                                      "error": "INTERNAL_SERVER_ERROR",
-                                      "message": "Ocurrio un error inesperado",
-                                      "status": 500,
-                                    },
-                                },
-                            },
-                        },
-                    },
                   "200":
                     {
                       "description": "Carga completada exitosamente",
@@ -231,6 +190,27 @@
                                       "data": null,
                                       "errors": null,
                                       "message": "Subida completada exitosamente",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                  "401":
+                    {
+                      "description": "Error de autenticación",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "example":
+                                    {
+                                      "status": 401,
+                                      "error": "Unauthorized",
+                                      "message": "El encabezado de autorizacion es invalido o no esta presente.",
+                                      "path": "/files-upload/generate-multipart-urls",
                                     },
                                 },
                             },
@@ -255,6 +235,26 @@
                                           "key": "El nombre del archivo (key) no puede estar vacío",
                                         },
                                       "message": "Errores de validación",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "Error interno del servidor",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "example":
+                                    {
+                                      "error": "INTERNAL_SERVER_ERROR",
+                                      "message": "Ocurrio un error inesperado",
+                                      "status": 500,
                                     },
                                 },
                             },
@@ -288,7 +288,7 @@
                 ],
               "responses":
                 {
-                  "500": { "description": "Error interno del servidor" },
+                  "401": { "description": "Credenciales inválidas" },
                   "200":
                     {
                       "description": "Autenticación exitosa",
@@ -303,7 +303,7 @@
                             },
                         },
                     },
-                  "401": { "description": "Credenciales inválidas" },
+                  "500": { "description": "Error interno del servidor" },
                 },
             },
         },
@@ -426,8 +426,8 @@
                       "description": "Lista de partes completadas con sus números y ETags",
                       "example":
                         [
-                          { "partNumber": 1, "eTag": '"abc123etaghash1"' },
-                          { "partNumber": 2, "eTag": '"abc123etaghash2"' },
+                          { "partNumber": 1, "eTag": "abc123etaghash1" },
+                          { "partNumber": 2, "eTag": "abc123etaghash2" },
                         ],
                       "items":
                         {
@@ -458,14 +458,14 @@
                       "minLength": 32,
                       "type": "string",
                       "description": "ETag devuelto por S3 al subir esta parte",
-                      "example": '"abc123etaghashabcdef1234567890"',
+                      "example": "abc123etaghashabcdef1234567890",
                     },
                 },
               "description": "Representa una parte individual de una carga multipart completada",
               "example":
                 [
-                  { "partNumber": 1, "eTag": '"abc123etaghash1"' },
-                  { "partNumber": 2, "eTag": '"abc123etaghash2"' },
+                  { "partNumber": 1, "eTag": "abc123etaghash1" },
+                  { "partNumber": 2, "eTag": "abc123etaghash2" },
                 ],
             },
           "JwtResponseDto":
