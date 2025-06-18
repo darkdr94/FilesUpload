@@ -146,6 +146,28 @@ security.jwt.expiration-ms=3600000
    `POST /files-upload/generate-multipart-urls`  
    Envía los metadatos del archivo (nombre, tamaño, tipo) y recibe un conjunto de URLs prefirmadas para cargar las partes directamente a S3.
 
+Para dividir un archivo de manera local en Windows se debe abrir la consola PowerShell y ejecutar el siguiente comnado:
+
+   ```
+    $partSize = 100MB
+    $inputFile = "Ruta completa del archivo incluyendo extension" 
+    $outputFolder = "Ruta de la carpeta donde quedaran las partes"
+    New-Item -ItemType Directory -Force -Path $outputFolder | Out-Null
+    
+    $buffer = New-Object byte[] $partSize
+    $index = 0
+    $stream = [System.IO.File]::OpenRead($inputFile)
+    
+    while (($read = $stream.Read($buffer, 0, $partSize)) -gt 0) {
+        $fileName = Join-Path $outputFolder ("part_{0:D3}.bin" -f $index)
+        [System.IO.File]::WriteAllBytes($fileName, $buffer[0..($read-1)])
+        $index++
+    }
+    $stream.Close()
+
+   ```
+Las partes del archivo quedaran con los nombres: part_000.bin, part_001.bin, ... etc
+
 2. **Sube las partes directamente a S3**  
    `PUT {presigned_url}`  
    Desde el cliente (por ejemplo, navegador o frontend), se debe realizar una solicitud HTTP `PUT` a cada URL prefirmada recibida en el paso anterior.  
