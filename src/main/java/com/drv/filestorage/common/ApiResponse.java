@@ -6,7 +6,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
-
+/**
+ * Clase que encapsula las respuestas de los servicios
+ * @param <T>
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

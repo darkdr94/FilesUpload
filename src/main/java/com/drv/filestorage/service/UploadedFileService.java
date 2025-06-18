@@ -8,6 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ *  Servicio de capa intermedia encargado de gestionar operaciones
+ *  sobre archivos registrados en la base de datos
+ */
 @Service
 public class UploadedFileService {
 

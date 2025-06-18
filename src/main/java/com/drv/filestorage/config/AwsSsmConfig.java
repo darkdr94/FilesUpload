@@ -6,6 +6,9 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ssm.SsmClient;
 
+/**
+ * Configuración del cliente ssm de AWS
+ */
 @Configuration
 public class AwsSsmConfig {
 
