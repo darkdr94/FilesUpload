@@ -6,11 +6,11 @@ Servicio backend para la carga **multipart de archivos** hacia AWS S3. Implement
 
 ## 📑 Tabla de Contenido
 
-1. [Instalacion](#-instalación)
-2. [Variables de Entorno](#-variables-de-entorno)
+1. [Instalación](#-instalación)
+2. [Variables de Entorno](#%EF%B8%8F-variables-de-entorno)
 3. [Uso](#-uso)
-4. [Documentacion de la API](#-documentacion-de-la-api)
-5. [Tecnologias Usadas](#-tecnologías-usadas)
+4. [Documentación de la API](#-documentación-de-la-api)
+5. [Tecnologías Usadas](#%EF%B8%8F-tecnolog%C3%ADas-usadas)
 6. [Contribuir](#-contribuir)
 7. [Licencia](#-licencia)
 
