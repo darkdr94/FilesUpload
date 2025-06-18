@@ -1,115 +1,127 @@
 # 📂 FilesUpload API
 
-Servicio backend para la carga **multipart de archivos** hacia AWS S3. Implementado en Java 20 con Spring Boot 3.2.5, soporta URLs prefirmadas, validaciones y finalización segura de cargas por partes.
+Servicio backend para la carga **multipart de archivos** hacia AWS S3. Implementado en Java 20 con Spring Boot 3.2.5, soporta URLs prefirmadas, validaciones y finalización segura de cargas por partes.
 
 ---
 
-## 📁 Tabla de Contenido
+## 📑 Tabla de Contenido
 
-* [Instalación](#instalación)
-* [Uso](#uso)
-* [Variables de Entorno](#variables-de-entorno)
-* [Documentación de la API](#documentación-de-la-api)
-* [Tecnologías Usadas](#tecnologías-usadas)
-* [Contribuir](#contribuir)
-* [Licencia](#licencia)
+1. [Instalación](#instalación)
+2. [Variables de Entorno](#variables-de-entorno)
+3. [Uso](#uso)
+4. [Documentación de la API](#documentación-de-la-api)
+5. [Tecnologías Usadas](#tecnologías-usadas)
+6. [Contribuir](#contribuir)
+7. [Licencia](#licencia)
 
 ---
 
 ## 🚀 Instalación
 
-Clona el proyecto y ejecuta localmente:
+Clona el repositorio y levanta la aplicación:
 
 ```bash
-git clone https://github.com/darkdr94/FilesUpload.git
-cd FilesUpload
-./mvnw spring-boot:run
+$ git clone https://github.com/darkdr94/FilesUpload.git
+$ cd FilesUpload
+$ ./mvnw spring-boot:run
 ```
 
 ---
 
-## ⚙️ Variables de Entorno y Parámetros configurados en AWS SSM
+## ⚙️ Variables de Entorno
 
-Estos parámetros deben estar definidos en AWS Systems Manager Parameter Store y son leídos por la aplicación en tiempo de ejecución. Puedes definirlos localmente en `application.properties` solo para desarrollo, **pero no deben ser publicados**.
+### 🔒 Parámetros en AWS SSM
 
-| Parámetro                            | Descripción                                                                 |
-|-------------------------------------|-----------------------------------------------------------------------------|
-| `app.ssm.db-url-param`              | Ruta en SSM que contiene la URL de conexión a la base de datos PostgreSQL. |
-| `app.ssm.db-username-param`         | Ruta en SSM que contiene el nombre de usuario de la base de datos.         |
-| `app.ssm.db-password-param`         | Ruta en SSM que contiene la contraseña del usuario de la base de datos.    |
-| `app.ssm.bucket-name-param`         | Ruta en SSM que contiene el nombre base del bucket de S3 utilizado.        |
-| `app.ssm.user-password`             | Ruta en SSM con la contraseña cifrada o en texto plano para el usuario de autenticación local. |
+Estos parámetros **deben** existir en AWS Systems Manager Parameter Store y se cargan al iniciar la aplicación. En desarrollo puedes usar `application.properties`, **pero no** subir estos valores.
 
+| Parámetro                   | Descripción                                            |
+| --------------------------- | ------------------------------------------------------ |
+| `app.ssm.db-url-param`      | SSM: URL de conexión a la base de datos PostgreSQL     |
+| `app.ssm.db-username-param` | SSM: Nombre de usuario de la base de datos             |
+| `app.ssm.db-password-param` | SSM: Contraseña del usuario de la base de datos        |
+| `app.ssm.bucket-name-param` | SSM: Nombre raíz del bucket de S3                      |
+| `app.ssm.user-password`     | SSM: Contraseña para el usuario de autenticación local |
+
+Las siguientes variables corresponden a configuración de rendimiento y seguridad
+
+| Propiedad                         | Descripción                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------- |
+| `app.s3.presign-duration-minutes` | Duración **minutos** de validez de cada URL prefirmada. (Ej: `60` → expira en 1 hora) |
+| `app.s3.part-size-megabytes`      | Tamaño **MB** de cada parte al generar las URLs. (Ej: `100` → partes de 100 MB)       |
+| `security.jwt.expiration-ms`      | TTL **ms** del token JWT. (Ej: `3600000` → 3 600 000 ms = 1 hora)                     |
+
+> ⚠️ Ajusta estos valores según rendimiento y seguridad:
+>
+> * URLs cont tiempos muy cortos → renuevos frecuentes.
+> * Partes muy grandes → consumo de memoria.
+> * JWT corto → re-login frecuente.
+
+### 📋 `application.properties` (ejemplo)
 
 ```properties
-# Configuración general
 spring.application.name=filestorage
 server.port=8080
 server.address=0.0.0.0
 
-# Base de datos
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
-# Codificación
 spring.http.encoding.charset=UTF-8
 spring.http.encoding.enabled=true
 spring.http.encoding.force=true
 
-# Logging
 logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n
 logging.level.root=INFO
 logging.level.com.drv.filestorage=DEBUG
 
-# Parámetros desde AWS SSM O puedes definirlos localmente pero NO publicarlos
+# Parámetros AWS SSM (reemplazar por tus rutas)
 app.ssm.db-url-param=
 app.ssm.db-username-param=
 app.ssm.db-password-param=
 app.ssm.bucket-name-param=
-app.ssm.user-password=/filestorage/auth/userdrv94-password
+app.ssm.user-password=
 
-# Configuración del S3 multipart
+# Variables de configuración
 app.s3.presign-duration-minutes=60
 app.s3.part-size-megabytes=100
-
-# JWT
 security.jwt.expiration-ms=3600000
 ```
-
 ---
 
 ## 💡 Uso
 
-1. **Inicia una carga multipart**  
-   `POST /files-upload/generate-multipart-urls`  
-   Envía los metadatos del archivo (nombre, tamaño, tipo) y recibe un conjunto de URLs prefirmadas para cargar las partes directamente a S3.
+1. **Iniciar Multipart Upload**
+   `POST /files-upload/generate-multipart-urls`
+   Envía JSON con `{ filename, fileSizeBytes, contentType }`.
+   Recibirás un objeto con `key`, `uploadId` y un array de URLs prefirmadas.
 
-2. **Sube las partes directamente a S3**  
-   `PUT {presigned_url}`  
-   Desde el cliente (por ejemplo, navegador o frontend), realiza una solicitud HTTP `PUT` a cada URL prefirmada recibida en el paso anterior.  
-   Cada solicitud debe incluir una parte del archivo **en formato binario** (raw bytes) en el cuerpo de la petición. Debes obtener el valor del header "eTag" de cada una de las peticiones.  
-   > **Importante**: Estas cargas se hacen directamente a S3, sin pasar por el backend.
+2. **Subir Partes a S3**
+   `PUT {presigned_url}`
+   Cada petición debe:
 
+   * Usar método **PUT** a la URL prefirmada.
+   * Incluir **raw bytes** de esa parte en el cuerpo.
+   * Capturar el header `ETag` de la respuesta.
 
-3. **Finaliza la carga**  
-   `POST /files-upload/complete-multiparts-upload`  
-   Envía la lista de partes cargadas (con sus `eTags` y `partNumber`) para que S3 ensamble el archivo final.
+   > **Nota:** Estas solicitudes no pasan por tu backend.
 
----
+3. **Completar Multipart Upload**
+   `POST /files-upload/complete-multiparts-upload`
+   Envía JSON con `key`, `uploadId` y `parts: [{ partNumber, eTag }, ...]` para que S3 ensamble el archivo.
+
 
 ## 📘 Documentación de la API
 
-Swagger UI está desplegado en GitHub Pages:
-
-👉 [https://darkdr94.github.io/FilesUpload](https://darkdr94.github.io/FilesUpload)
+La documentación interactiva está disponible en GitHub Pages:
+🔗 [https://darkdr94.github.io/FilesUpload](https://darkdr94.github.io/FilesUpload)
 
 ---
 
 ## 🛠️ Tecnologías Usadas
 
-* 🧐 Java 20
-* 🔥 Spring Boot 3.2.5
-* ☁️ AWS S3 (Multipart Upload)
-* 🛡️ AWS SSM (Parameter Store)
+* 🧐 Java 20
+* 🔥 Spring Boot 3.2.5
+* ☁️ AWS S3 (Multipart Upload)
+* 🛡️ AWS SSM (Parameter Store)
 * 📄 PostgreSQL
 * 📜 Swagger / OpenAPI
 
@@ -117,14 +129,13 @@ Swagger UI está desplegado en GitHub Pages:
 
 ## 🤝 Contribuir
 
-¡Las contribuciones son bienvenidas!
-Puedes crear un **Pull Request** o reportar un **Issue** para colaborar con mejoras o nuevas funcionalidades.
+1. Haz **fork** del repositorio.
+2. Crea una **rama feature**.
+3. Realiza tus cambios y haz **commit**.
+4. Abre un **Pull Request**.
 
 ---
 
 ## 📍 Licencia
 
-Este proyecto está licenciado bajo la licencia **MIT**.
-Puedes reutilizarlo libremente incluyendo el aviso de copyright original.
-
----
+Este proyecto está bajo **MIT License** — ver `LICENSE` para detalles.
