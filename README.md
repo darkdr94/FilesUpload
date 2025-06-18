@@ -19,10 +19,10 @@ Servicio backend para la carga **multipart de archivos** hacia AWS S3. Implement
 
 ## ✅ Prerequisitos
 
-Antes de ejecutar este proyecto, asegúrate de contar con lo siguiente:
+Antes de ejecutar este proyecto, se debe contar con lo siguiente:
 
 ### 🧾 Cuenta de AWS
-Debes tener una cuenta de AWS con acceso programático (Access Key + Secret Key) y:
+Se debe tener una cuenta de AWS con acceso programático (Access Key + Secret Key) y:
 
 - Un **usuario IAM** con permisos sobre:
   - **Amazon S3** (crear y listar buckets, y operaciones multipart)
@@ -31,19 +31,35 @@ Debes tener una cuenta de AWS con acceso programático (Access Key + Secret Key)
   - **RDS o PostgreSQL** (acceso a la base de datos)
 
 ### 🗄️ Base de Datos PostgreSQL
-El backend requiere conexión a una base de datos PostgreSQL. Puedes:  
+El backend requiere conexión a una base de datos PostgreSQL. Se puede:  
 
 - Usar Amazon RDS u otra instancia accesible desde la app.
-- Asegúrate de tener:
+- Se debe tener:
   - URL de conexión (jdbc:postgresql://...)
   - Usuario y contraseña
-  - Seguridad de red configurada para permitir acceso desde donde corra tu backend
+  - Seguridad de red configurada para permitir acceso desde donde corra el backend
+   - Crear la tabla principal:
+
+ ```bash
+  CREATE TABLE uploaded_files (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    filename TEXT NOT NULL,
+    content_type TEXT,
+    s3_key TEXT NOT NULL,
+    upload_id TEXT,
+    bucket_name TEXT,
+    size_bytes BIGINT,
+    uploaded_by TEXT,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT now()
+);
+```
 
 > 📌 La base de datos puede estar en cualquier proveedor o en local, mientras sea accesible por red desde el backend.
 
 ## 🚀 Instalación
 
-Clona el repositorio y levanta la aplicación:
+Se debe clonar el repositorio, configurar las variables de entorno y levantar la aplicación:
 
 ```bash
 $ git clone https://github.com/darkdr94/FilesUpload.git
@@ -57,7 +73,7 @@ $ ./mvnw spring-boot:run
 
 ### 🔒 Parámetros en AWS SSM
 
-Estos parámetros **deben** existir en AWS Systems Manager Parameter Store y se cargan al iniciar la aplicación. En desarrollo puedes usar `application.properties`, **pero no** subir estos valores.
+Estos parámetros **deben** existir en AWS Systems Manager Parameter Store y se cargan al iniciar la aplicación. En desarrollo se puede usar `application.properties`, **pero no** subir estos valores.
 
 | Parámetro                   | Descripción                                            |
 | --------------------------- | ------------------------------------------------------ |
@@ -70,7 +86,7 @@ Estos parámetros **deben** existir en AWS Systems Manager Parameter Store y se 
 
 ### ☁️ S3 Multipart & JWT
 
-Las siguientes variables corresponden a configuración de rendimiento y seguridad
+Las siguientes variables corresponden a configuración de rendimiento y seguridad.
 
 | Propiedad                         | Descripción                                                                           |
 | --------------------------------- | ------------------------------------------------------------------------------------- |
@@ -78,9 +94,9 @@ Las siguientes variables corresponden a configuración de rendimiento y segurida
 | app.s3.part-size-megabytes      | Tamaño **MB** de cada parte al generar las URLs. (Ej: 100 → partes de 100 MB)       |
 | security.jwt.expiration-ms      | TTL **ms** del token JWT. (Ej: 3600000 → 3 600 000 ms = 1 hora)                     |
 
-> ⚠️ Ajusta estos valores según rendimiento y seguridad:
+> ⚠️ Ajustar estos valores según rendimiento y seguridad:
 >
-> * URLs cont tiempos muy cortos → renuevos frecuentes.
+> * URLs prefirmadas con tiempos muy cortos → renuevos frecuentes.
 > * Partes muy grandes → consumo de memoria.
 > * JWT corto → re-login frecuente.
 
@@ -121,8 +137,8 @@ security.jwt.expiration-ms=3600000
 
 ### Autenticación
 1. `POST /auth/login`  
-   User: userdrv94 (sección de gestión de usuarios por construir) y password el que hayas definido en la variable `app.ssm.user-password`  
-   Genera el token JWT que debe enviarse en el Header Authorization como Bearer token
+   User: userdrv94 (sección de gestión de usuarios por construir) y password el que se haya definido en la variable `app.ssm.user-password`.  
+   Este servicio genera el token JWT que debe enviarse en las otras peticiones en el Header Authorization como Bearer token.
 
 ### Flujo de carga multipart
 
@@ -132,7 +148,7 @@ security.jwt.expiration-ms=3600000
 
 2. **Sube las partes directamente a S3**  
    `PUT {presigned_url}`  
-   Desde el cliente (por ejemplo, navegador o frontend), realiza una solicitud HTTP `PUT` a cada URL prefirmada recibida en el paso anterior.  
+   Desde el cliente (por ejemplo, navegador o frontend), se debe realizar una solicitud HTTP `PUT` a cada URL prefirmada recibida en el paso anterior.  
    Cada solicitud debe incluir una parte del archivo **en formato binario** (raw bytes) en el cuerpo de la petición.  
    > **Importante**: Estas cargas se hacen directamente a S3, sin pasar por el backend.
 
@@ -159,14 +175,26 @@ security.jwt.expiration-ms=3600000
 
 ---
 
-## 🤝 Contribuir
+## 🤝 Contribuciones
 
-¡Las contribuciones son bienvenidas!
-Puedes crear un Pull Request o reportar un Issue para colaborar con mejoras o nuevas funcionalidades.
+Se agradece cualquier tipo de contribución que permita mejorar este proyecto.
+
+Para contribuir, se recomienda:
+
+1. Realizar un fork del repositorio.
+2. Crear una rama para cada cambio propuesto.
+3. Aplicar buenas prácticas de desarrollo, incluyendo documentación y pruebas si aplica.
+4. Abrir un Pull Request describiendo claramente los cambios realizados y su propósito.
+
+También es posible colaborar reportando errores o sugiriendo mejoras a través del sistema de Issues.
 
 ---
 
-## 📍 Licencia
+## 📄 Licencia
 
-Este proyecto está licenciado bajo la licencia MIT.
-Puedes reutilizarlo libremente incluyendo el aviso de copyright original.
+Este proyecto se encuentra disponible bajo los términos de la licencia [MIT](./LICENSE).
+
+Esto permite utilizar, copiar, modificar, fusionar, publicar, distribuir y sublicenciar el software, respetando siempre el aviso de derechos de autor incluido en el repositorio.
+
+Para mayor información, consultar el archivo [`LICENSE`](./LICENSE).
+
