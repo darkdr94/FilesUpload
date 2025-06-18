@@ -40,9 +40,9 @@
                 },
               "responses":
                 {
-                  "400":
+                  "401":
                     {
-                      "description": "Errores de validación",
+                      "description": "Error de autenticación",
                       "content":
                         {
                           "application/json":
@@ -52,13 +52,10 @@
                                   "type": "string",
                                   "example":
                                     {
-                                      "success": false,
-                                      "data": null,
-                                      "errors":
-                                        {
-                                          "filename": "El nombre del archivo solo puede contener letras, números, guiones, puntos y guiones bajos",
-                                        },
-                                      "message": "Errores de validación",
+                                      "status": 401,
+                                      "error": "Unauthorized",
+                                      "message": "El encabezado de autorizacion es invalido o no esta presente.",
+                                      "path": "/files-upload/generate-multipart-urls",
                                     },
                                 },
                             },
@@ -84,9 +81,9 @@
                             },
                         },
                     },
-                  "401":
+                  "400":
                     {
-                      "description": "Error de autenticación",
+                      "description": "Errores de validación",
                       "content":
                         {
                           "application/json":
@@ -96,10 +93,13 @@
                                   "type": "string",
                                   "example":
                                     {
-                                      "status": 401,
-                                      "error": "Unauthorized",
-                                      "message": "El encabezado de autorizacion es invalido o no esta presente.",
-                                      "path": "/files-upload/generate-multipart-urls",
+                                      "success": false,
+                                      "data": null,
+                                      "errors":
+                                        {
+                                          "filename": "El nombre del archivo solo puede contener letras, números, guiones, puntos y guiones bajos",
+                                        },
+                                      "message": "Errores de validación",
                                     },
                                 },
                             },
@@ -116,25 +116,32 @@
                                 {
                                   "$ref": "#/components/schemas/MultipartUploadResponseDto",
                                 },
-                              "example":
+                              "examples":
                                 {
-                                  "success": true,
-                                  "message": "Multipart upload iniciado correctamente para el archivo test.png",
-                                  "data":
+                                  "Multipart Upload Success":
                                     {
-                                      "key": "usuario/2025/06/uuid_test_test.png",
-                                      "uploadId": "EjemploUploadId",
-                                      "urls":
-                                        [
-                                          {
-                                            "partNumber": 1,
-                                            "url": "https://s3...1",
-                                          },
-                                          {
-                                            "partNumber": 2,
-                                            "url": "https://s3...2",
-                                          },
-                                        ],
+                                      "description": "Multipart Upload Success",
+                                      "value":
+                                        {
+                                          "success": true,
+                                          "message": "Multipart upload iniciado correctamente para el archivo test.png",
+                                          "data":
+                                            {
+                                              "key": "usuario/2025/06/uuid_test_test.png",
+                                              "uploadId": "EjemploUploadId",
+                                              "urls":
+                                                [
+                                                  {
+                                                    "partNumber": 1,
+                                                    "url": "https://s3...1",
+                                                  },
+                                                  {
+                                                    "partNumber": 2,
+                                                    "url": "https://s3...2",
+                                                  },
+                                                ],
+                                            },
+                                        },
                                     },
                                 },
                             },
@@ -182,15 +189,15 @@
                                       "status": 401,
                                       "error": "Unauthorized",
                                       "message": "El encabezado de autorizacion es invalido o no esta presente.",
-                                      "path": "/files-upload/complete-multiparts-upload",
+                                      "path": "/files-upload/generate-multipart-urls",
                                     },
                                 },
                             },
                         },
                     },
-                  "400":
+                  "500":
                     {
-                      "description": "Errores de validación",
+                      "description": "Error interno del servidor",
                       "content":
                         {
                           "application/json":
@@ -200,13 +207,9 @@
                                   "type": "string",
                                   "example":
                                     {
-                                      "success": false,
-                                      "data": null,
-                                      "errors":
-                                        {
-                                          "key": "El nombre del archivo (key) no puede estar vacío",
-                                        },
-                                      "message": "Errores de validación",
+                                      "error": "INTERNAL_SERVER_ERROR",
+                                      "message": "Ocurrio un error inesperado",
+                                      "status": 500,
                                     },
                                 },
                             },
@@ -233,9 +236,9 @@
                             },
                         },
                     },
-                  "500":
+                  "400":
                     {
-                      "description": "Error interno del servidor",
+                      "description": "Errores de validación",
                       "content":
                         {
                           "application/json":
@@ -245,9 +248,13 @@
                                   "type": "string",
                                   "example":
                                     {
-                                      "error": "INTERNAL_SERVER_ERROR",
-                                      "message": "Ocurrio un error inesperado",
-                                      "status": 500,
+                                      "success": false,
+                                      "data": null,
+                                      "errors":
+                                        {
+                                          "key": "El nombre del archivo (key) no puede estar vacío",
+                                        },
+                                      "message": "Errores de validación",
                                     },
                                 },
                             },
@@ -281,6 +288,7 @@
                 ],
               "responses":
                 {
+                  "500": { "description": "Error interno del servidor" },
                   "200":
                     {
                       "description": "Autenticación exitosa",
@@ -295,7 +303,6 @@
                             },
                         },
                     },
-                  "500": { "description": "Error interno del servidor" },
                   "401": { "description": "Credenciales inválidas" },
                 },
             },
