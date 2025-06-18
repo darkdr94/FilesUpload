@@ -19,12 +19,16 @@ import java.util.Map;
 @RestControllerAdvice
 public class RestExceptionHandler {
 
+    private static final String ERROR ="error";
+    private static final String MESSAGE ="message";
+    private static final String STATUS ="status";
+
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<Map<String, Object>> handleApiException(ApiException ex) {
         Map<String, Object> error = new HashMap<>();
-        error.put("error", ex.getCode());
-        error.put("message", ex.getMessage());
-        error.put("status", ex.getStatus());
+        error.put(ERROR, ex.getCode());
+        error.put(MESSAGE, ex.getMessage());
+        error.put(STATUS, ex.getStatus());
         log.error("API exception caught: {} - {} -", ex.getCode(), ex.getMessage(), ex);
         return ResponseEntity.status(ex.getStatus())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -35,9 +39,9 @@ public class RestExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
         ex.printStackTrace();
         Map<String, Object> error = new HashMap<>();
-        error.put("error", "INTERNAL_SERVER_ERROR");
-        error.put("message", "Ocurrio un error inesperado");
-        error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        error.put(ERROR, "INTERNAL_SERVER_ERROR");
+        error.put(MESSAGE, "Ocurrio un error inesperado");
+        error.put(STATUS, HttpStatus.INTERNAL_SERVER_ERROR.value());
         log.error("Unhandled exception caught: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON).
@@ -47,9 +51,9 @@ public class RestExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidBody(HttpMessageNotReadableException ex) {
         Map<String, Object> error = new HashMap<>();
-        error.put("error", "INVALID_REQUEST_BODY");
-        error.put("message", "El cuerpo de la solicitud es invalido o esta vacio.");
-        error.put("status", HttpStatus.BAD_REQUEST.value());
+        error.put(ERROR, "INVALID_REQUEST_BODY");
+        error.put(MESSAGE, "El cuerpo de la solicitud es invalido o esta vacio.");
+        error.put(STATUS, HttpStatus.BAD_REQUEST.value());
         log.warn("Invalid request body: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
