@@ -1,0 +1,480 @@
+{
+  "openapi": "3.0.1",
+  "info": { "title": "OpenAPI definition", "version": "v0" },
+  "servers":
+    [{ "url": "http://localhost:8080", "description": "Generated server url" }],
+  "tags":
+    [
+      {
+        "name": "Autenticación",
+        "description": "Operaciones relacionadas con la autenticación de usuarios",
+      },
+      {
+        "name": "Carga de Archivos",
+        "description": "Operaciones para manejar cargas multipart de archivos",
+      },
+    ],
+  "paths":
+    {
+      "/files-upload/generate-multipart-urls":
+        {
+          "post":
+            {
+              "tags": ["Carga de Archivos"],
+              "summary": "Generar URLs prefirmadas para carga multipart",
+              "description": "Inicia un proceso de carga multipart en S3, validando el nombre, tipo y tamaño del archivo.",
+              "operationId": "generatePresignedUrls",
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/MultipartUploadRequestDto",
+                            },
+                        },
+                    },
+                  "required": true,
+                },
+              "responses":
+                {
+                  "400":
+                    {
+                      "description": "Errores de validación",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "example":
+                                    {
+                                      "success": false,
+                                      "data": null,
+                                      "errors":
+                                        {
+                                          "filename": "El nombre del archivo solo puede contener letras, números, guiones, puntos y guiones bajos",
+                                        },
+                                      "message": "Errores de validación",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "Error interno del servidor",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "example":
+                                    {
+                                      "error": "INTERNAL_SERVER_ERROR",
+                                      "message": "Ocurrio un error inesperado",
+                                      "status": 500,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                  "401":
+                    {
+                      "description": "Error de autenticación",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "example":
+                                    {
+                                      "status": 401,
+                                      "error": "Unauthorized",
+                                      "message": "El encabezado de autorizacion es invalido o no esta presente.",
+                                      "path": "/files-upload/generate-multipart-urls",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                  "200":
+                    {
+                      "description": "URLs generadas exitosamente",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/MultipartUploadResponseDto",
+                                },
+                              "example":
+                                {
+                                  "success": true,
+                                  "message": "Multipart upload iniciado correctamente para el archivo test.png",
+                                  "data":
+                                    {
+                                      "key": "usuario/2025/06/uuid_test_test.png",
+                                      "uploadId": "EjemploUploadId",
+                                      "urls":
+                                        [
+                                          {
+                                            "partNumber": 1,
+                                            "url": "https://s3...1",
+                                          },
+                                          {
+                                            "partNumber": 2,
+                                            "url": "https://s3...2",
+                                          },
+                                        ],
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/files-upload/complete-multiparts-upload":
+        {
+          "post":
+            {
+              "tags": ["Carga de Archivos"],
+              "summary": "Completa el proceso de carga multipart",
+              "description": "Indica a S3 que todas las partes han sido cargadas y finaliza el proceso de subida",
+              "operationId": "completeUpload",
+              "requestBody":
+                {
+                  "content":
+                    {
+                      "application/json":
+                        {
+                          "schema":
+                            {
+                              "$ref": "#/components/schemas/CompleteUploadRequestDto",
+                            },
+                        },
+                    },
+                  "required": true,
+                },
+              "responses":
+                {
+                  "401":
+                    {
+                      "description": "Error de autenticación",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "example":
+                                    {
+                                      "status": 401,
+                                      "error": "Unauthorized",
+                                      "message": "El encabezado de autorizacion es invalido o no esta presente.",
+                                      "path": "/files-upload/complete-multiparts-upload",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                  "400":
+                    {
+                      "description": "Errores de validación",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "example":
+                                    {
+                                      "success": false,
+                                      "data": null,
+                                      "errors":
+                                        {
+                                          "key": "El nombre del archivo (key) no puede estar vacío",
+                                        },
+                                      "message": "Errores de validación",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                  "200":
+                    {
+                      "description": "Carga completada exitosamente",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "example":
+                                    {
+                                      "success": true,
+                                      "data": null,
+                                      "errors": null,
+                                      "message": "Subida completada exitosamente",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                  "500":
+                    {
+                      "description": "Error interno del servidor",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "type": "string",
+                                  "example":
+                                    {
+                                      "error": "INTERNAL_SERVER_ERROR",
+                                      "message": "Ocurrio un error inesperado",
+                                      "status": 500,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+      "/auth/login":
+        {
+          "post":
+            {
+              "tags": ["Autenticación"],
+              "summary": "Autenticación de usuario",
+              "description": "Iniciar sesión y obtener un token JWT",
+              "operationId": "login",
+              "parameters":
+                [
+                  {
+                    "name": "username",
+                    "in": "query",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                  {
+                    "name": "password",
+                    "in": "query",
+                    "required": true,
+                    "schema": { "type": "string" },
+                  },
+                ],
+              "responses":
+                {
+                  "200":
+                    {
+                      "description": "Autenticación exitosa",
+                      "content":
+                        {
+                          "application/json":
+                            {
+                              "schema":
+                                {
+                                  "$ref": "#/components/schemas/JwtResponseDto",
+                                },
+                            },
+                        },
+                    },
+                  "500": { "description": "Error interno del servidor" },
+                  "401": { "description": "Credenciales inválidas" },
+                },
+            },
+        },
+    },
+  "components":
+    {
+      "schemas":
+        {
+          "MultipartUploadRequestDto":
+            {
+              "required": ["contentType", "fileSizeBytes", "filename"],
+              "type": "object",
+              "properties":
+                {
+                  "filename":
+                    {
+                      "maxLength": 200,
+                      "minLength": 3,
+                      "pattern": "^[a-zA-Z0-9._-]+$",
+                      "type": "string",
+                      "description": "Nombre del archivo a subir (sin rutas). Puede incluir letras, números, puntos, guiones y guiones bajos.",
+                      "example": "mi_archivo.jpg",
+                    },
+                  "fileSizeBytes":
+                    {
+                      "maximum": 107374182400,
+                      "minimum": 5242880,
+                      "type": "integer",
+                      "description": "Tamaño total del archivo en bytes. Mínimo 5 MB y máximo 100 GB.",
+                      "format": "int64",
+                      "example": 104857600,
+                    },
+                  "contentType":
+                    {
+                      "pattern": "^[a-zA-Z0-9.+\\-]+/[a-zA-Z0-9.+\\-]+$",
+                      "type": "string",
+                      "description": "Tipo MIME del archivo (por ejemplo, image/jpeg, application/pdf).",
+                      "example": "application/pdf",
+                    },
+                },
+              "description": "Petición para generar URLs prefirmadas para carga multipart de archivos",
+            },
+          "MultipartUploadResponseDto":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "key":
+                    {
+                      "type": "string",
+                      "description": "Ruta (key) del archivo en S3",
+                      "example": "user123/2025/06/archivo.jpg",
+                    },
+                  "uploadId":
+                    {
+                      "type": "string",
+                      "description": "Identificador del upload multipart en S3",
+                      "example": "VXBsb2FkSUQxMjM0NTY3ODkw",
+                    },
+                  "urls":
+                    {
+                      "type": "array",
+                      "description": "Listado de URLs por cada parte a subir",
+                      "example": '[{ partNumber: 1, url: "https://s3..." }]',
+                      "items":
+                        { "$ref": "#/components/schemas/PartInfoResponseDto" },
+                    },
+                },
+              "description": "Respuesta con información del multipart upload iniciado",
+            },
+          "PartInfoResponseDto":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "partNumber":
+                    {
+                      "type": "integer",
+                      "description": "Número de la parte",
+                      "format": "int32",
+                      "example": 1,
+                    },
+                  "presignedUrl":
+                    {
+                      "type": "string",
+                      "description": "URL prefirmada para subir la parte",
+                      "example": "https://bucket.s3.amazonaws.com/...",
+                    },
+                },
+              "description": "Información de cada parte para el upload multipart",
+              "example": '[{ partNumber: 1, url: "https://s3..." }]',
+            },
+          "CompleteUploadRequestDto":
+            {
+              "required": ["key", "parts", "uploadId"],
+              "type": "object",
+              "properties":
+                {
+                  "key":
+                    {
+                      "maxLength": 1024,
+                      "minLength": 3,
+                      "type": "string",
+                      "description": "Ruta (key) completa del archivo en S3",
+                      "example": "user123/2025/06/archivo.jpg",
+                    },
+                  "uploadId":
+                    {
+                      "maxLength": 1024,
+                      "minLength": 5,
+                      "type": "string",
+                      "description": "Identificador único del upload multipart generado por S3",
+                      "example": "W1tZb3VHaWRWZndzZWc3LUVRZ21jc3guLi4=",
+                    },
+                  "parts":
+                    {
+                      "maxItems": 10000,
+                      "minItems": 0,
+                      "type": "array",
+                      "description": "Lista de partes completadas con sus números y ETags",
+                      "example":
+                        [
+                          { "partNumber": 1, "eTag": '"abc123etaghash1"' },
+                          { "partNumber": 2, "eTag": '"abc123etaghash2"' },
+                        ],
+                      "items":
+                        {
+                          "$ref": "#/components/schemas/CompletedPartRequestDto",
+                        },
+                    },
+                },
+              "description": "Petición para completar un proceso de carga multipart en S3",
+            },
+          "CompletedPartRequestDto":
+            {
+              "required": ["eTag"],
+              "type": "object",
+              "properties":
+                {
+                  "partNumber":
+                    {
+                      "maximum": 10000,
+                      "minimum": 1,
+                      "type": "integer",
+                      "description": "Número de parte de la carga multipart",
+                      "format": "int32",
+                      "example": 1,
+                    },
+                  "eTag":
+                    {
+                      "maxLength": 100,
+                      "minLength": 32,
+                      "type": "string",
+                      "description": "ETag devuelto por S3 al subir esta parte",
+                      "example": '"abc123etaghashabcdef1234567890"',
+                    },
+                },
+              "description": "Representa una parte individual de una carga multipart completada",
+              "example":
+                [
+                  { "partNumber": 1, "eTag": '"abc123etaghash1"' },
+                  { "partNumber": 2, "eTag": '"abc123etaghash2"' },
+                ],
+            },
+          "JwtResponseDto":
+            {
+              "type": "object",
+              "properties":
+                {
+                  "token":
+                    {
+                      "type": "string",
+                      "description": "Token JWT generado",
+                      "example": "eyJhbGciOiJIUzI1NiIsIn...",
+                    },
+                },
+              "description": "Respuesta JWT generada al autenticar el usuario",
+            },
+        },
+    },
+}
