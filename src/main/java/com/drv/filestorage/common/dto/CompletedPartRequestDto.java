@@ -21,7 +21,7 @@ public class CompletedPartRequestDto {
     @Schema(
             name = "eTag",
             description = "ETag devuelto por S3 al subir esta parte",
-            example = "\"abc123etaghashabcdef1234567890\""
+            example = "abc123etaghashabcdef1234567890"
     )
     @NotNull(message = "El eTag es obligatorio")
     @NotBlank(message = "El eTag no puede estar vacío")

@@ -40,8 +40,8 @@ public class CompleteUploadRequestDto {
             description = "Lista de partes completadas con sus números y ETags",
             example = """
         [
-            { "partNumber": 1, "eTag": "\\"abc123etaghash1\\"" },
-            { "partNumber": 2, "eTag": "\\"abc123etaghash2\\"" }
+            { "partNumber": 1, "eTag": "abc123etaghash1" },
+            { "partNumber": 2, "eTag": "abc123etaghash2" }
         ]
         """
     )
