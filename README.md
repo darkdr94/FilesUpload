@@ -6,15 +6,40 @@ Servicio backend para la carga **multipart de archivos** hacia AWS S3. Implement
 
 ## 📑 Tabla de Contenido
 
-1. [Instalación](#-instalación)
-2. [Variables de Entorno](#%EF%B8%8F-variables-de-entorno)
-3. [Uso](#-uso)
-4. [Documentación de la API](#-documentación-de-la-api)
-5. [Tecnologías Usadas](#%EF%B8%8F-tecnolog%C3%ADas-usadas)
-6. [Contribuir](#-contribuir)
-7. [Licencia](#-licencia)
+1. [Prerequisitos](#prerequisitos) 
+2. [Instalación](#-instalación)
+3. [Variables de Entorno](#%EF%B8%8F-variables-de-entorno)
+4. [Uso](#-uso)
+5. [Documentación de la API](#-documentación-de-la-api)
+6. [Tecnologías Usadas](#%EF%B8%8F-tecnolog%C3%ADas-usadas)
+7. [Contribuir](#-contribuir)
+8. [Licencia](#-licencia)
 
 ---
+
+## ✅ Prerequisitos
+
+Antes de ejecutar este proyecto, asegúrate de contar con lo siguiente:
+
+### 🧾 Cuenta de AWS
+Debes tener una cuenta de AWS con acceso programático (Access Key + Secret Key) y:
+
+- Un **usuario IAM** con permisos sobre:
+  - **Amazon S3** (crear y listar buckets, y operaciones multipart)
+  - **SSM Parameter Store** (lectura de parámetros seguros)
+  - **CloudWatch Logs** (opcional, para monitoreo)
+  - **RDS o PostgreSQL** (acceso a la base de datos)
+
+### 🗄️ Base de Datos PostgreSQL
+El backend requiere conexión a una base de datos PostgreSQL. Puedes:  
+
+- Usar Amazon RDS u otra instancia accesible desde la app.
+- Asegúrate de tener:
+  - URL de conexión (jdbc:postgresql://...)
+  - Usuario y contraseña
+  - Seguridad de red configurada para permitir acceso desde donde corra tu backend
+
+> 📌 La base de datos puede estar en cualquier proveedor o en local, mientras sea accesible por red desde el backend.
 
 ## 🚀 Instalación
 
