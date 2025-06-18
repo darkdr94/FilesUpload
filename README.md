@@ -6,11 +6,11 @@ Servicio backend para la carga **multipart de archivos** hacia AWS S3. Implement
 
 ## 📑 Tabla de Contenido
 
-1. [Instalación](#instalación)
+1. [Instalacion](#instalacion)
 2. [Variables de Entorno](#variables-de-entorno)
 3. [Uso](#uso)
-4. [Documentación de la API](#documentación-de-la-api)
-5. [Tecnologías Usadas](#tecnologías-usadas)
+4. [Documentacion de la API](#documentacion-de-la-api)
+5. [Tecnologias Usadas](#tecnologias-usadas)
 6. [Contribuir](#contribuir)
 7. [Licencia](#licencia)
 
@@ -42,20 +42,6 @@ Estos parámetros **deben** existir en AWS Systems Manager Parameter Store y se 
 | `app.ssm.bucket-name-param` | SSM: Nombre raíz del bucket de S3                      |
 | `app.ssm.user-password`     | SSM: Contraseña para el usuario de autenticación local |
 
-Las siguientes variables corresponden a configuración de rendimiento y seguridad
-
-| Propiedad                         | Descripción                                                                           |
-| --------------------------------- | ------------------------------------------------------------------------------------- |
-| `app.s3.presign-duration-minutes` | Duración **minutos** de validez de cada URL prefirmada. (Ej: `60` → expira en 1 hora) |
-| `app.s3.part-size-megabytes`      | Tamaño **MB** de cada parte al generar las URLs. (Ej: `100` → partes de 100 MB)       |
-| `security.jwt.expiration-ms`      | TTL **ms** del token JWT. (Ej: `3600000` → 3 600 000 ms = 1 hora)                     |
-
-> ⚠️ Ajusta estos valores según rendimiento y seguridad:
->
-> * URLs cont tiempos muy cortos → renuevos frecuentes.
-> * Partes muy grandes → consumo de memoria.
-> * JWT corto → re-login frecuente.
-
 ### 📋 `application.properties` (ejemplo)
 
 ```properties
@@ -79,12 +65,8 @@ app.ssm.db-username-param=
 app.ssm.db-password-param=
 app.ssm.bucket-name-param=
 app.ssm.user-password=
-
-# Variables de configuración
-app.s3.presign-duration-minutes=60
-app.s3.part-size-megabytes=100
-security.jwt.expiration-ms=3600000
 ```
+
 ---
 
 ## 💡 Uso
@@ -108,6 +90,32 @@ security.jwt.expiration-ms=3600000
    `POST /files-upload/complete-multiparts-upload`
    Envía JSON con `key`, `uploadId` y `parts: [{ partNumber, eTag }, ...]` para que S3 ensamble el archivo.
 
+---
+
+## ☁️ S3 Multipart & JWT
+
+| Propiedad                         | Descripción                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------- |
+| `app.s3.presign-duration-minutes` | Duración **minutos** de validez de cada URL prefirmada. (Ej: `60` → expira en 1 hora) |
+| `app.s3.part-size-megabytes`      | Tamaño **MB** de cada parte al generar las URLs. (Ej: `100` → partes de 100 MB)       |
+| `security.jwt.expiration-ms`      | TTL **ms** del token JWT. (Ej: `3600000` → 3 600 000 ms = 1 hora)                     |
+
+```properties
+# S3 Multipart
+aapp.s3.presign-duration-minutes=60
+app.s3.part-size-megabytes=100
+
+# JWT
+security.jwt.expiration-ms=3600000
+```
+
+> ⚠️ Ajusta estos valores según rendimiento y seguridad:
+>
+> * URLs muy cortas → renuevos frecuentes.
+> * Partes muy grandes → consumo de memoria.
+> * JWT corto → re-login frecuente.
+
+---
 
 ## 📘 Documentación de la API
 
