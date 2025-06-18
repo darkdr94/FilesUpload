@@ -6,7 +6,7 @@ Servicio backend para la carga **multipart de archivos** hacia AWS S3. Implement
 
 ## 📑 Tabla de Contenido
 
-1. [Prerequisitos](#prerequisitos) 
+1. [Prerequisitos](#-prerequisitos) 
 2. [Instalación](#-instalación)
 3. [Variables de Entorno](#%EF%B8%8F-variables-de-entorno)
 4. [Uso](#-uso)
