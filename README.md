@@ -42,6 +42,24 @@ Estos parámetros **deben** existir en AWS Systems Manager Parameter Store y se 
 | `app.ssm.bucket-name-param` | SSM: Nombre raíz del bucket de S3                      |
 | `app.ssm.user-password`     | SSM: Contraseña para el usuario de autenticación local |
 
+
+### ☁️ S3 Multipart & JWT
+
+Las siguientes variables corresponden a configuración de rendimiento y seguridad
+
+| Propiedad                         | Descripción                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------- |
+| app.s3.presign-duration-minutes | Duración **minutos** de validez de cada URL prefirmada. (Ej: 60 → expira en 1 hora) |
+| app.s3.part-size-megabytes      | Tamaño **MB** de cada parte al generar las URLs. (Ej: 100 → partes de 100 MB)       |
+| security.jwt.expiration-ms      | TTL **ms** del token JWT. (Ej: 3600000 → 3 600 000 ms = 1 hora)                     |
+
+> ⚠️ Ajusta estos valores según rendimiento y seguridad:
+>
+> * URLs cont tiempos muy cortos → renuevos frecuentes.
+> * Partes muy grandes → consumo de memoria.
+> * JWT corto → re-login frecuente.
+
+
 ### 📋 `application.properties` (ejemplo)
 
 ```properties
@@ -65,68 +83,49 @@ app.ssm.db-username-param=
 app.ssm.db-password-param=
 app.ssm.bucket-name-param=
 app.ssm.user-password=
+
+#S3 Multipart & JWT
+app.s3.presign-duration-minutes=60
+app.s3.part-size-megabytes=100
+security.jwt.expiration-ms=3600000
 ```
 
 ---
 
 ## 💡 Uso
 
-1. **Iniciar Multipart Upload**
-   `POST /files-upload/generate-multipart-urls`
-   Envía JSON con `{ filename, fileSizeBytes, contentType }`.
-   Recibirás un objeto con `key`, `uploadId` y un array de URLs prefirmadas.
+### Autenticación
+1. `POST /auth/login`  
+   User: userdrv94 (sección de gestión de usuarios por construir) y password el que hayas definido en la variable `app.ssm.user-password`  
+   Genera el token JWT que debe enviarse en el Header Authorization como Bearer token
 
-2. **Subir Partes a S3**
-   `PUT {presigned_url}`
-   Cada petición debe:
+### Flujo de carga multipart
 
-   * Usar método **PUT** a la URL prefirmada.
-   * Incluir **raw bytes** de esa parte en el cuerpo.
-   * Capturar el header `ETag` de la respuesta.
+1. **Inicia una carga multipart**  
+   `POST /files-upload/generate-multipart-urls`  
+   Envía los metadatos del archivo (nombre, tamaño, tipo) y recibe un conjunto de URLs prefirmadas para cargar las partes directamente a S3.
 
-   > **Nota:** Estas solicitudes no pasan por tu backend.
+2. **Sube las partes directamente a S3**  
+   `PUT {presigned_url}`  
+   Desde el cliente (por ejemplo, navegador o frontend), realiza una solicitud HTTP `PUT` a cada URL prefirmada recibida en el paso anterior.  
+   Cada solicitud debe incluir una parte del archivo **en formato binario** (raw bytes) en el cuerpo de la petición.  
+   > **Importante**: Estas cargas se hacen directamente a S3, sin pasar por el backend.
 
-3. **Completar Multipart Upload**
-   `POST /files-upload/complete-multiparts-upload`
-   Envía JSON con `key`, `uploadId` y `parts: [{ partNumber, eTag }, ...]` para que S3 ensamble el archivo.
-
----
-
-## ☁️ S3 Multipart & JWT
-
-| Propiedad                         | Descripción                                                                           |
-| --------------------------------- | ------------------------------------------------------------------------------------- |
-| `app.s3.presign-duration-minutes` | Duración **minutos** de validez de cada URL prefirmada. (Ej: `60` → expira en 1 hora) |
-| `app.s3.part-size-megabytes`      | Tamaño **MB** de cada parte al generar las URLs. (Ej: `100` → partes de 100 MB)       |
-| `security.jwt.expiration-ms`      | TTL **ms** del token JWT. (Ej: `3600000` → 3 600 000 ms = 1 hora)                     |
-
-```properties
-# S3 Multipart
-aapp.s3.presign-duration-minutes=60
-app.s3.part-size-megabytes=100
-
-# JWT
-security.jwt.expiration-ms=3600000
-```
-
-> ⚠️ Ajusta estos valores según rendimiento y seguridad:
->
-> * URLs muy cortas → renuevos frecuentes.
-> * Partes muy grandes → consumo de memoria.
-> * JWT corto → re-login frecuente.
+3. **Finaliza la carga**  
+   `POST /files-upload/complete-multiparts-upload`  
+   Envía la lista de partes cargadas (con sus `ETags` y `partNumber`) para que S3 ensamble el archivo final.
 
 ---
 
 ## 📘 Documentación de la API
 
-La documentación interactiva está disponible en GitHub Pages:
-🔗 [https://darkdr94.github.io/FilesUpload](https://darkdr94.github.io/FilesUpload)
+🔗 La documentación interactiva está disponible en GitHub Pages: [![Ver Swagger UI](https://img.shields.io/badge/Swagger-UI-green)](https://darkdr94.github.io/FilesUpload/)
 
 ---
 
 ## 🛠️ Tecnologías Usadas
 
-* 🧐 Java 20
+* 🧠 Java 20
 * 🔥 Spring Boot 3.2.5
 * ☁️ AWS S3 (Multipart Upload)
 * 🛡️ AWS SSM (Parameter Store)
@@ -137,13 +136,12 @@ La documentación interactiva está disponible en GitHub Pages:
 
 ## 🤝 Contribuir
 
-1. Haz **fork** del repositorio.
-2. Crea una **rama feature**.
-3. Realiza tus cambios y haz **commit**.
-4. Abre un **Pull Request**.
+¡Las contribuciones son bienvenidas!
+Puedes crear un Pull Request o reportar un Issue para colaborar con mejoras o nuevas funcionalidades.
 
 ---
 
 ## 📍 Licencia
 
-Este proyecto está bajo **MIT License** — ver `LICENSE` para detalles.
+Este proyecto está licenciado bajo la licencia MIT.
+Puedes reutilizarlo libremente incluyendo el aviso de copyright original.
