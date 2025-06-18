@@ -5,6 +5,9 @@ import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
+/**
+ * Validación personalizada para el content type de los archivos
+ */
 @Documented
 @Constraint(validatedBy = MimeTypeValidator.class)
 @Target({ ElementType.TYPE })

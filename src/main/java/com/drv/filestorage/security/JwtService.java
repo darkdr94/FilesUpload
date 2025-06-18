@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 
+/**
+ * Servicio utilitario que genera y valida tokens JWT
+ * para la autenticación de usuarios en la aplicación
+ */
 @Service
 public class JwtService {
 

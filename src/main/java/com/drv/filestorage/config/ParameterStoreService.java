@@ -8,6 +8,9 @@ import software.amazon.awssdk.services.ssm.model.GetParametersRequest;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Permite obtener los parametros almacenados en el ssm de AWS con manejo de cache
+ */
 @Service
 public class ParameterStoreService {
 

@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Clase para manejar excepcion personalizada para solicitudes no autenticadas
+ * Construye un mensaje personalizado
+ */
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 

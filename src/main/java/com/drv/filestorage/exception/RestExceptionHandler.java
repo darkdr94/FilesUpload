@@ -1,14 +1,21 @@
 package com.drv.filestorage.exception;
 
 import com.drv.filestorage.exception.base.ApiException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Centralizador de manejo de excepciones
+ */
+@Slf4j
 @RestControllerAdvice
 public class RestExceptionHandler {
 
@@ -18,7 +25,10 @@ public class RestExceptionHandler {
         error.put("error", ex.getCode());
         error.put("message", ex.getMessage());
         error.put("status", ex.getStatus());
-        return ResponseEntity.status(ex.getStatus()).body(error);
+        log.error("API exception caught: {} - {} -", ex.getCode(), ex.getMessage(), ex);
+        return ResponseEntity.status(ex.getStatus())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(error);
     }
 
     @ExceptionHandler(Exception.class)
@@ -26,8 +36,23 @@ public class RestExceptionHandler {
         ex.printStackTrace();
         Map<String, Object> error = new HashMap<>();
         error.put("error", "INTERNAL_SERVER_ERROR");
-        error.put("message", "Ocurrió un error inesperado");
+        error.put("message", "Ocurrio un error inesperado");
         error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        log.error("Unhandled exception caught: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON).
+                body(error);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidBody(HttpMessageNotReadableException ex) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("error", "INVALID_REQUEST_BODY");
+        error.put("message", "El cuerpo de la solicitud es invalido o esta vacio.");
+        error.put("status", HttpStatus.BAD_REQUEST.value());
+        log.warn("Invalid request body: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(error);
     }
 }

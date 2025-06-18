@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Obtiene el password del usuario desde ssm de AWS
+ */
 @Configuration
 public class SecurityProperties {
 

@@ -14,6 +14,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Clase que intercepta cada solicitud HTTP y validar el tokenJWT
+ */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -33,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String authHeader = req.getHeader("Authorization");
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                throw new InvalidJwtException("El encabezado de autorización es inválido o no está presente.");
+                throw new InvalidJwtException("El encabezado de autorizacion es invalido o no esta presente.");
             }
 
             String jwt = authHeader.substring(7);

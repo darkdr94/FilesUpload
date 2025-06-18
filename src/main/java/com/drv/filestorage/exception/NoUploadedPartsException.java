@@ -3,6 +3,9 @@ package com.drv.filestorage.exception;
 import com.drv.filestorage.exception.base.ApiException;
 import org.springframework.http.HttpStatus;
 
+/**
+ * Clase para manejar excepcion personalizada al completar la subida de archivos
+ */
 public class NoUploadedPartsException extends ApiException {
     public NoUploadedPartsException(String key, String uploadId) {
         super(

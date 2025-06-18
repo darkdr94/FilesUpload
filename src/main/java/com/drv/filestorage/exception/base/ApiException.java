@@ -1,5 +1,8 @@
 package com.drv.filestorage.exception.base;
 
+/**
+ * Clase abstracta para el manejo de errores
+ */
 public abstract class ApiException extends RuntimeException {
     private final int status;
     private final String code;

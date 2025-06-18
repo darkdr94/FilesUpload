@@ -7,6 +7,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
+/**
+ * Configuración de la conexion a la BD
+ */
 @Configuration
 @RequiredArgsConstructor
 public class DynamicDataSourceConfig {
